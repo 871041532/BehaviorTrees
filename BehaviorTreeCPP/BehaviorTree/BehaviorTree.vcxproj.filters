@@ -42,9 +42,6 @@
     <ClCompile Include="Vec4.cpp">
       <Filter>源文件\math</Filter>
     </ClCompile>
-    <ClCompile Include="BTNode.cpp">
-      <Filter>源文件\math</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Defines.hpp">

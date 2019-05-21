@@ -242,10 +242,10 @@ public:
 	{
 		//init bev tree
 		BTNode& ret =
-			BevNodeFactory::oCreatePrioritySelectorNode(NULL, "root");
-		BevNodeFactory::oCreateTeminalNode<NOD_MoveTo>(&ret, "move to")
+			BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
+		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&ret, "move to")
 			.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
-		BevNodeFactory::oCreateTeminalNode<NOD_Idle>(&ret, "idle")
+		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
 			.SetNodePrecondition(new BTPreconditionTrue());
 		m_BevTreeRoot = &ret;
 	}
@@ -314,14 +314,14 @@ protected:
 	virtual void Create()
 	{
 		//init bev tree
-		BTNode& ret = BevNodeFactory::oCreatePrioritySelectorNode(NULL, "root");
-		BTNode& p = BevNodeFactory::oCreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
+		BTNode& ret = BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
+		BTNode& p = BTNodeFactory::CreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
 			.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
-		BevNodeFactory::oCreateTeminalNode<NOD_MoveTo>(&p, "move to")
+		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&p, "move to")
 			.SetNodePrecondition(new BTPreconditionTrue());
-		BevNodeFactory::oCreateTeminalNode<NOD_Breathe>(&p, "breathing")
+		BTNodeFactory::CreateTeminalNode<NOD_Breathe>(&p, "breathing")
 			.SetNodePrecondition(new BTPreconditionTrue());
-		BevNodeFactory::oCreateTeminalNode<NOD_Idle>(&ret, "idle")
+		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
 			.SetNodePrecondition(new BTPreconditionTrue());
 		m_BevTreeRoot = &ret;
 	}
@@ -341,17 +341,17 @@ protected:
 	virtual void Create()
 	{
 		//init bev tree
-		BTNode& ret = BevNodeFactory::oCreatePrioritySelectorNode(NULL, "root");
-		BTNode& p = BevNodeFactory::oCreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
+		BTNode& ret = BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
+		BTNode& p = BTNodeFactory::CreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
 			.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
-		BTNode& sq = BevNodeFactory::oCreateSequenceNode(&p, "sequence");
-		BevNodeFactory::oCreateTeminalNode<NOD_TurnTo>(&sq, "turn to")
+		BTNode& sq = BTNodeFactory::CreateSequenceNode(&p, "sequence");
+		BTNodeFactory::CreateTeminalNode<NOD_TurnTo>(&sq, "turn to")
 			.SetNodePrecondition(new BTPreconditionTrue());
-		BevNodeFactory::oCreateTeminalNode<NOD_MoveTo>(&sq, "move to")
+		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&sq, "move to")
 			.SetNodePrecondition(new CON_HasFacedToTarget());
-		BevNodeFactory::oCreateTeminalNode<NOD_Breathe>(&p, "breathing")
+		BTNodeFactory::CreateTeminalNode<NOD_Breathe>(&p, "breathing")
 			.SetNodePrecondition(new BTPreconditionTrue());
-		BevNodeFactory::oCreateTeminalNode<NOD_Idle>(&ret, "idle")
+		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
 			.SetNodePrecondition(new BTPreconditionTrue());
 		m_BevTreeRoot = &ret;
 	}

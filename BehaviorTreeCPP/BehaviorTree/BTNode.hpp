@@ -556,53 +556,110 @@ private:
 	int m_loopCount;
 	int m_currentCount = 0;
 };
+bool BTNodeLoop::OnEvaluate(const BTNodeInputParam& input)
+{
+	bool checkLoopCount = (m_loopCount == kInfiniteLoop) ||
+		m_currentCount < m_loopCount;
 
-class BevNodeFactory
+	if (!checkLoopCount)
+		return false;
+
+	if (_bCheckIndex(0))
+	{
+		BTNode* child = m_childNodeList[0];
+		if (child->Evaluate(input))
+			return true;
+	}
+	return false;
+}
+void BTNodeLoop::OnTransition(const BTNodeInputParam& input)
+{
+	if (_bCheckIndex(0))
+	{
+		BTNode* child = m_childNodeList[0];
+		child->Transition(input);
+	}
+	m_currentCount = 0;
+}
+StatusBTRunning BTNodeLoop::OnTick(const BTNodeInputParam& input, BTNodeOutputParam& output)
+{
+	StatusBTRunning bIsFinish = StatusBTRunning::Finish;
+	if (_bCheckIndex(0))
+	{
+		BTNode* oBN = m_childNodeList[0];
+		bIsFinish = oBN->Tick(input, output);
+
+		if (bIsFinish == StatusBTRunning::Finish)
+		{
+			if (m_loopCount != kInfiniteLoop)
+			{
+				// 有限循环
+				++m_currentCount;
+				if (m_currentCount < m_loopCount)  // 作者原版是 == 
+				{
+					bIsFinish = StatusBTRunning::Executing;
+				}
+			}
+			else
+			{
+				// 无限循环
+				bIsFinish = StatusBTRunning::Executing;
+			}
+		}
+	}
+	if (bIsFinish != StatusBTRunning::Executing)
+	{
+		m_currentCount = 0;
+	}
+	return bIsFinish;
+}
+
+class BTNodeFactory
 {
 public:
-	static BTNode& oCreateParallelNode(BTNode* _o_Parent, E_ParallelFinishCondition _e_Condition, const char* _debugName)
+	static BTNode& CreateParallelNode(BTNode* parent, E_ParallelFinishCondition condition, const char* debugName)
 	{
-		BTNodeParallel* pReturn = new BTNodeParallel(_o_Parent);
-		pReturn->SetFinishCondition(_e_Condition);
-		oCreateNodeCommon(pReturn, _o_Parent, _debugName);
+		BTNodeParallel* pReturn = new BTNodeParallel(parent);
+		pReturn->SetFinishCondition(condition);
+		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}
-	static BTNode& oCreatePrioritySelectorNode(BTNode* _o_Parent, const char* _debugName)
+	static BTNode& CreatePrioritySelectorNode(BTNode* parent, const char* debugName)
 	{
-		BTNodePrioritySelector* pReturn = new BTNodePrioritySelector(_o_Parent);
-		oCreateNodeCommon(pReturn, _o_Parent, _debugName);
+		BTNodePrioritySelector* pReturn = new BTNodePrioritySelector(parent);
+		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}
-	static BTNode& oCreateNonePrioritySelectorNode(BTNode* _o_Parent, const char* _debugName)
+	static BTNode& CreateNonePrioritySelectorNode(BTNode* parent, const char* debugName)
 	{
-		BTNodeNonePrioritySelector* pReturn = new BTNodeNonePrioritySelector(_o_Parent);
-		oCreateNodeCommon(pReturn, _o_Parent, _debugName);
+		BTNodeNonePrioritySelector* pReturn = new BTNodeNonePrioritySelector(parent);
+		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}
-	static BTNode& oCreateSequenceNode(BTNode* _o_Parent, const char* _debugName)
+	static BTNode& CreateSequenceNode(BTNode* parent, const char* debugName)
 	{
-		BTNodeSequence* pReturn = new BTNodeSequence(_o_Parent);
-		oCreateNodeCommon(pReturn, _o_Parent, _debugName);
+		BTNodeSequence* pReturn = new BTNodeSequence(parent);
+		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}
-	static BTNode& oCreateLoopNode(BTNode* _o_Parent, const char* _debugName, int _i_LoopCount)
+	static BTNode& CreateLoopNode(BTNode* parent, const char* debugName, int loopCount)
 	{
-		BTNodeLoop* pReturn = new BTNodeLoop(_o_Parent, nullptr, _i_LoopCount);
-		oCreateNodeCommon(pReturn, _o_Parent, _debugName);
+		BTNodeLoop* pReturn = new BTNodeLoop(parent, nullptr, loopCount);
+		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}
 	template<typename T>
-	static BTNode& oCreateTeminalNode(BTNode* _o_Parent, const char* _debugName)
+	static BTNode& CreateTeminalNode(BTNode* parent, const char* debugName)
 	{
-		BTNodeTerminal* pReturn = new T(_o_Parent);
-		oCreateNodeCommon(pReturn, _o_Parent, _debugName);
+		BTNodeTerminal* pReturn = new T(parent);
+		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}
 private:
-	static void oCreateNodeCommon(BTNode* _o_Me, BTNode* _o_Parent, const char* _debugName)
+	static void CreateNodeCommon(BTNode* me, BTNode* parent, const char* debugName)
 	{
-		if (_o_Parent)
-			_o_Parent->AddChildNode(_o_Me);
-		_o_Me->SetDebugName(_debugName);
+		if (parent)
+			parent->AddChildNode(me);
+		me->SetDebugName(debugName);
 	}
 };
