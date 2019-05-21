@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\math">
+      <UniqueIdentifier>{2a5bfad8-f961-465f-874b-79931aab7f89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\math">
+      <UniqueIdentifier>{7fd3a14e-b55d-4680-bca9-33a7358bcc01}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BehaviorTree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Vec2.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vec3.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Quat.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Mat3.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Mat4.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vec4.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="BTNode.cpp">
+      <Filter>源文件\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Defines.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BTTest.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Color32.hpp">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec2.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec3.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quat.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Mat3.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Mat4.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec4.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAll.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.hpp">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="BTNode.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
