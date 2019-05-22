@@ -1,6 +1,7 @@
 #pragma once
 
-# include "Defines.hpp"
+#include "Defines.hpp"
+#include <functional>
 #define BT_MaxBTChildNodeNum 16
 #define BT_InvalidChildNodeIndex  BT_MaxBTChildNodeNum
 
@@ -30,7 +31,23 @@ typedef AnyData BTNodeOutputParam;
 class BTPrecondition
 {
 public:
-	virtual bool ExternalCondition(const BTNodeInputParam& input) const = 0;
+	virtual bool ExternalCondition(const BTNodeInputParam& input)
+	{
+		if (m_dynamicJudge != nullptr)
+		{
+			return m_dynamicJudge(input);
+		}
+		else
+		{
+			return true;
+		}
+	}
+	void SetDynamicJudge(std::function<bool(const BTNodeInputParam& input)> call)
+	{
+		m_dynamicJudge = call;
+	}
+private:
+	std::function<bool(const BTNodeInputParam& input)> m_dynamicJudge = nullptr;
 };
 
 class BTPreconditionTrue : public BTPrecondition
@@ -395,17 +412,59 @@ class BTNodeTerminal : public BTNode
 public:
 	BTNodeTerminal(BTNode* parentNode, BTPrecondition* precondition = nullptr)
 		: BTNode(parentNode, precondition){}
-	virtual void OnTransition(const BTNodeInputParam& input);
-	virtual StatusBTRunning OnTick(const BTNodeInputParam& input, BTNodeOutputParam& output);
+	BTNodeTerminal& SetDynamicOnExecute(std::function<StatusBTRunning(const BTNodeInputParam& input, BTNodeOutputParam& output)> call)
+	{
+		m_dynamicOnExecute = call;
+		return (*this);
+	}
+	BTNodeTerminal& SetDynamicOnEnter(std::function<void(const BTNodeInputParam&)> call)
+	{
+		m_dynamicOnEnter = call;
+		return (*this);
+	}
+	BTNodeTerminal& SetDynamicOnExit(std::function<void(const BTNodeInputParam&, StatusBTRunning)> call)
+	{
+		m_dynamicOnExit = call;
+		return (*this);
+	}
+	virtual void OnTransition(const BTNodeInputParam& input) override;
+	virtual StatusBTRunning OnTick(const BTNodeInputParam& input, BTNodeOutputParam& output) override;
 
 protected:
-	virtual void OnEnter(const BTNodeInputParam& input) {}
-	virtual StatusBTRunning	OnExecute(const BTNodeInputParam& input, BTNodeOutputParam& output) { return StatusBTRunning::Finish; }
-	virtual void OnExit(const BTNodeInputParam& input, StatusBTRunning _ui_ExitID) {}
+	virtual void OnEnter(const BTNodeInputParam& input) 
+	{
+		if (m_dynamicOnEnter != nullptr)
+		{
+			m_dynamicOnEnter(input);
+		}
+	}
+	virtual StatusBTRunning	OnExecute(const BTNodeInputParam& input, BTNodeOutputParam& output)
+	{ 
+		StatusBTRunning returnStatus = StatusBTRunning::Finish;
+		if (m_dynamicOnExecute != nullptr)
+		{
+			returnStatus = m_dynamicOnExecute(input, output);
+		}
+		return returnStatus;
+	}
+	virtual void OnExit(const BTNodeInputParam& input, StatusBTRunning _ui_ExitID) 
+	{
+		if (m_dynamicOnExit != nullptr)
+		{
+			m_dynamicOnExit(input, _ui_ExitID);
+		}
+	}
 
 private:
 	StausNodeTerminal m_Status = StausNodeTerminal::Ready;
 	bool m_needExit = false;
+	// 动态设置的OnExecute方法
+	std::function<StatusBTRunning(const BTNodeInputParam&, BTNodeOutputParam&)> m_dynamicOnExecute = nullptr;
+	// 动态设置的OnEnter方法
+	std::function<void(const BTNodeInputParam&)> m_dynamicOnEnter = nullptr;
+	// 动态设置的OnExit方法
+	std::function<void(const BTNodeInputParam&, StatusBTRunning)> m_dynamicOnExit = nullptr;
+
 };
 void BTNodeTerminal::OnTransition(const BTNodeInputParam& input)
 {
@@ -649,7 +708,7 @@ public:
 		return (*pReturn);
 	}
 	template<typename T>
-	static BTNode& CreateTeminalNode(BTNode* parent, const char* debugName)
+	static BTNodeTerminal& CreateTeminalNode(BTNode* parent, const char* debugName)
 	{
 		BTNodeTerminal* pReturn = new T(parent);
 		CreateNodeCommon(pReturn, parent, debugName);
