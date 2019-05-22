@@ -73,7 +73,27 @@ int main()
 		root.Tick(input, output);
 	}
 
-	StatusBTRunning adasd = (StatusBTRunning)-1;
-    cout << (int)adasd << endl;
+	auto run1 = []()->int {
+		cout << "run1" << endl;
+		return 1;
+	};
+	auto run2 = []()->int {
+		cout << "run2" << endl;
+		return 0;
+	};
+	auto judge = []()->bool {
+		return true;
+	};
+	BTInit();
+	auto id = CreateRootNode();
+	auto id2 = CreateTeminalNode(id, run1);
+	auto id3 = CreateTeminalNode(id, run2);
+	auto id4 = CreateCondition(judge);
+	NodeSetPreCondition(id2, id4);
+	Tick();
+	Tick();
+	Tick();
+	BTDestory();
+
 	system("pause");
 }

@@ -28,6 +28,7 @@ D_Inline void InnerAssertion(const char* _strExpr, const char* _strFile, int _iL
 class AnyData
 {
 public:
+	AnyData(){}
 	template<typename RealDataType>
 	AnyData(RealDataType* data)
 		: m_RealData(data)

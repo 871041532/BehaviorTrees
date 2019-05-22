@@ -9,71 +9,93 @@ unordered_map<uint, BTNode*> BTRootNodes;
 unordered_map<uint, BTNode*> BTNormalNodes;
 unordered_map<uint, BTPrecondition*> ConditionNodes;
 uint BTCurrentIndex;
-
+BTNodeInputParam* GlobalInput = nullptr;
+BTNodeOutputParam* GlobalOutput = nullptr;
+Export void Tick()
+{
+	for (auto&& it : BTRootNodes)
+	{
+		if (it.second->Evaluate(*GlobalInput))
+		{
+			it.second->Tick(*GlobalInput, *GlobalOutput);
+		}
+	}
+}
 Export uint CreateRootNode()
 {
-	BTRootNodes[BTCurrentIndex] = new BTNodeSequence(nullptr);
-	return ++BTCurrentIndex;
+	BTNode* root = new BTNodeSequence(nullptr);
+	BTRootNodes[BTCurrentIndex] = root;
+	BTNormalNodes[BTCurrentIndex] = root;
+	return BTCurrentIndex++;
 }
 Export void NodeSetPreCondition(uint nodeId, uint conditionId)
 {
 	BTNode* node = BTNormalNodes[nodeId];
-	BTPrecondition* condition = ConditionNodes[nodeId];
+	BTPrecondition* condition = ConditionNodes[conditionId];
 	node->SetNodePrecondition(condition);
 }
 Export uint CreateCondition(bool(*dynamicJudge)())
 {
 	ConditionNodes[BTCurrentIndex] = new BTPrecondition();
 	ConditionNodes[BTCurrentIndex]->SetDynamicJudge([dynamicJudge](const BTNodeInputParam& input) ->bool {return dynamicJudge();});
-	return ++BTCurrentIndex;
+	return BTCurrentIndex++;
 }
 Export uint CreateTeminalNode(uint parentId, int(*dynamicOnExcute)())
 {
-	BTNode* parent = BTRootNodes[parentId];
+	BTNode* parent = BTNormalNodes[parentId];
 	BTNodeTerminal* node = new BTNodeTerminal(parent);
+	parent->AddChildNode(node);
 	node->SetDynamicOnExecute([dynamicOnExcute](const BTNodeInputParam&input, const BTNodeOutputParam&output) ->StatusBTRunning {
 		StatusBTRunning result = (StatusBTRunning)dynamicOnExcute();
 		return result;
 	});
 	BTNormalNodes[BTCurrentIndex] = node;
-	return ++BTCurrentIndex;
+	return BTCurrentIndex++;
 }
 Export uint CreateSequenceNode(uint parentId)
 {
-	BTNode* parent = BTRootNodes[parentId];
-	BTNormalNodes[BTCurrentIndex] = new BTNodeSequence(parent);
-	return ++BTCurrentIndex;
+	BTNode* parent = BTNormalNodes[parentId];
+	auto node = new BTNodeSequence(parent);
+	parent->AddChildNode(node);
+	BTNormalNodes[BTCurrentIndex] = node;
+	return BTCurrentIndex++;
 }
 Export uint CreateLoopNode(uint parentId)
 {
-	BTNode* parent = BTRootNodes[parentId];
+	BTNode* parent = BTNormalNodes[parentId];
 	BTNormalNodes[BTCurrentIndex] = new BTNodeSequence(parent);
-	return ++BTCurrentIndex;
+	return BTCurrentIndex++;
 }
 Export uint CreateParallelNode(uint parentId)
 {
-	BTNode* parent = BTRootNodes[parentId];
-	BTNormalNodes[BTCurrentIndex] = new BTNodeParallel(parent);
-	return ++BTCurrentIndex;
+	BTNode* parent = BTNormalNodes[parentId];
+	auto node = new BTNodeParallel(parent);
+	parent->AddChildNode(node);
+	BTNormalNodes[BTCurrentIndex] = node;
+	return BTCurrentIndex++;
 }
 
 Export uint CreatePrioritySelectorNode(uint parentId)
 {
-	BTNode* parent = BTRootNodes[parentId];
-	BTNormalNodes[BTCurrentIndex] = new BTNodePrioritySelector(parent);
-	return ++BTCurrentIndex;
+	BTNode* parent = BTNormalNodes[parentId];
+	auto node = new BTNodePrioritySelector(parent);
+	parent->AddChildNode(node);
+	BTNormalNodes[BTCurrentIndex] = node;
+	return BTCurrentIndex++;
 }
 
 Export uint CreateNonePrioritySelectorNode(uint parentId)
 {
-	BTNode* parent = BTRootNodes[parentId];
-	BTNormalNodes[BTCurrentIndex] = new BTNodeNonePrioritySelector(parent);
-	return ++BTCurrentIndex;
+	BTNode* parent = BTNormalNodes[parentId];
+	auto node = new BTNodeNonePrioritySelector(parent);
+	parent->AddChildNode(node);
+	BTNormalNodes[BTCurrentIndex] = node;
+	return BTCurrentIndex++;
 }
 
 Export void BTInit()
 {
-	BTCurrentIndex = 0;
+	BTCurrentIndex = 1;
 }
 
 Export void BTDestory()

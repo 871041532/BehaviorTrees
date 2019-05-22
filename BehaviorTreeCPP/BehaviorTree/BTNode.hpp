@@ -164,7 +164,7 @@ public:
 		{
 			D_SafeDelete(m_childNodeList[i]);
 		}
-		D_SafeDelete(m_precondition);
+		//D_SafeDelete(m_precondition);
 	}
 	bool Evaluate(const BTNodeInputParam& input)
 	{
@@ -386,7 +386,10 @@ StatusBTRunning BTNodeSequence::OnTick(const BTNodeInputParam& input, BTNodeOutp
 		m_currentNodeIndex = 0;
 
 	BTNode* child = m_childNodeList[m_currentNodeIndex];
-	bIsFinish = child->Tick(input, output);
+	if (child != nullptr)
+	{
+		bIsFinish = child->Tick(input, output);
+	}
 	if (bIsFinish == StatusBTRunning::Finish)
 	{
 		++m_currentNodeIndex;
