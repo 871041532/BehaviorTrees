@@ -11,7 +11,17 @@ unordered_map<uint, BTPrecondition*> ConditionNodes;
 uint BTCurrentIndex;
 BTNodeInputParam* GlobalInput = nullptr;
 BTNodeOutputParam* GlobalOutput = nullptr;
-Export void Tick()
+
+Export void TickOne(uint rootId)
+{
+	BTNode* rootNode = BTRootNodes[rootId];
+	if (rootNode ->Evaluate(*GlobalInput))
+	{
+		rootNode ->Tick(*GlobalInput, *GlobalOutput);
+	}
+}
+
+Export void TickAll()
 {
 	for (auto&& it : BTRootNodes)
 	{
@@ -23,11 +33,18 @@ Export void Tick()
 }
 Export uint CreateRootNode()
 {
-	BTNode* root = new BTNodeSequence(nullptr);
+	BTNode* root = new BTNodeNonePrioritySelector(nullptr);
 	BTRootNodes[BTCurrentIndex] = root;
 	BTNormalNodes[BTCurrentIndex] = root;
 	return BTCurrentIndex++;
 }
+
+Export void NodeSetDynamicCondition(uint nodeId, bool(*dynamicjudge)())
+{
+	BTNode* node = BTNormalNodes[nodeId];
+	node->SetDynamicCondition(dynamicjudge);
+}
+
 Export void NodeSetPreCondition(uint nodeId, uint conditionId)
 {
 	BTNode* node = BTNormalNodes[nodeId];

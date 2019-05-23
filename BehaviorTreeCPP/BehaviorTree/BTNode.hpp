@@ -166,6 +166,10 @@ public:
 		}
 		//D_SafeDelete(m_precondition);
 	}
+	void SetDynamicCondition(std::function<bool()> call)
+	{
+		m_dynamicJudge = call;
+	}
 	bool Evaluate(const BTNodeInputParam& input)
 	{
 		return (m_precondition == nullptr || m_precondition->ExternalCondition(input)) && OnEvaluate(input);
@@ -228,7 +232,12 @@ protected:
 	//--------------------------------------------------------------
 	virtual bool OnEvaluate(const BTNodeInputParam& input)
 	{
-		return true;
+		bool ret = true;
+		if (m_dynamicJudge)
+		{
+			ret =  m_dynamicJudge();
+		}
+		return ret;
 	}
 	virtual void OnTransition(const BTNodeInputParam& input)
 	{
@@ -253,6 +262,7 @@ protected:
 	BTNode*                m_activeNode = nullptr;
 	BTNode*				   m_lastActiveNode = nullptr;
 	BTPrecondition*    m_precondition = nullptr;
+	std::function<bool()> m_dynamicJudge = nullptr;
 	std::string				  m_debugName = "defaultNodeName";
 };
 

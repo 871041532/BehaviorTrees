@@ -82,17 +82,13 @@ int main()
 		return 0;
 	};
 	auto judge = []()->bool {
-		return true;
+		return false;
 	};
 	BTInit();
 	auto id = CreateRootNode();
 	auto id2 = CreateTeminalNode(id, run1);
-	auto id3 = CreateTeminalNode(id, run2);
-	auto id4 = CreateCondition(judge);
-	NodeSetPreCondition(id2, id4);
-	Tick();
-	Tick();
-	Tick();
+	NodeSetDynamicCondition(id2, judge);
+	TickAll();
 	BTDestory();
 
 	system("pause");
