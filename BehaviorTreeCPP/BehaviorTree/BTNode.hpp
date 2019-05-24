@@ -50,40 +50,6 @@ private:
 	std::function<bool(const BTNodeInputParam& input)> m_dynamicJudge = nullptr;
 };
 
-class BTPreconditionTrue : public BTPrecondition
-{
-public:
-	virtual bool ExternalCondition(const BTNodeInputParam& input) const {
-		return true;
-	}
-};
-
-class BTPreconditionFalse : public BTPrecondition
-{
-public:
-	virtual bool ExternalCondition(const BTNodeInputParam& input) const {
-		return false;
-	}
-};
-
-class BTPreconditionNot : public BTPrecondition
-{
-public:
-	BTPreconditionNot(BTPrecondition* lhs)
-		: m_lhs(lhs)
-	{
-		D_CHECK(m_lhs);
-	}
-	~BTPreconditionNot() {
-		D_SafeDelete(m_lhs);
-	}
-	virtual bool ExternalCondition(const BTNodeInputParam& input) const {
-		return !m_lhs->ExternalCondition(input);
-	}
-private:
-	BTPrecondition* m_lhs;
-};
-
 class BTPreconditionAnd : public BTPrecondition
 {
 public:
@@ -150,13 +116,12 @@ private:
 class BTNode
 {
 public:
-	BTNode(BTNode* parentNode, BTPrecondition* nodeScript = nullptr)
+	BTNode(BTNode* parentNode)
 	{
 		for (int i = 0; i < BT_MaxBTChildNodeNum; ++i)
 			m_childNodeList[i] = nullptr;
 
 		_SetParentNode(parentNode);
-		SetNodePrecondition(nodeScript);
 	}
 	virtual ~BTNode()
 	{
@@ -164,15 +129,14 @@ public:
 		{
 			D_SafeDelete(m_childNodeList[i]);
 		}
-		//D_SafeDelete(m_precondition);
 	}
-	void SetDynamicCondition(std::function<bool()> call)
+	void SetPreCondition(std::function<bool()> precondition)
 	{
-		m_dynamicJudge = call;
+		m_precondition = precondition;
 	}
 	bool Evaluate(const BTNodeInputParam& input)
 	{
-		return (m_precondition == nullptr || m_precondition->ExternalCondition(input)) && OnEvaluate(input);
+		return (m_precondition == nullptr || m_precondition()) && OnEvaluate(input);
 	}
 	void Transition(const BTNodeInputParam& input)
 	{
@@ -193,17 +157,6 @@ public:
 		}
 		m_childNodeList[m_ChildNodeCount] = childNode;
 		++m_ChildNodeCount;
-		return (*this);
-	}
-	BTNode& SetNodePrecondition(BTPrecondition* precondition)
-	{
-		if (m_precondition != precondition)
-		{
-			if (m_precondition)
-				delete m_precondition;
-
-			m_precondition = precondition;
-		}
 		return (*this);
 	}
 	BTNode& SetDebugName(const char* debugName)
@@ -231,13 +184,8 @@ protected:
 	// virtual function
 	//--------------------------------------------------------------
 	virtual bool OnEvaluate(const BTNodeInputParam& input)
-	{
-		bool ret = true;
-		if (m_dynamicJudge)
-		{
-			ret =  m_dynamicJudge();
-		}
-		return ret;
+	{ 
+		return true;
 	}
 	virtual void OnTransition(const BTNodeInputParam& input)
 	{
@@ -261,16 +209,15 @@ protected:
 	BTNode*                m_parentNode = nullptr;
 	BTNode*                m_activeNode = nullptr;
 	BTNode*				   m_lastActiveNode = nullptr;
-	BTPrecondition*    m_precondition = nullptr;
-	std::function<bool()> m_dynamicJudge = nullptr;
+	std::function<bool()> m_precondition = nullptr;
 	std::string				  m_debugName = "defaultNodeName";
 };
 
 class BTNodePrioritySelector : public BTNode
 {
 public:
-	BTNodePrioritySelector(BTNode* parentNode, BTPrecondition* precondition = nullptr)
-		: BTNode(parentNode, precondition){}
+	BTNodePrioritySelector(BTNode* parentNode)
+		: BTNode(parentNode){}
 	virtual bool OnEvaluate(const BTNodeInputParam& input);
 	virtual void OnTransition(const BTNodeInputParam& input);
 	virtual StatusBTRunning OnTick(const BTNodeInputParam& input, BTNodeOutputParam& output);
@@ -330,11 +277,27 @@ StatusBTRunning BTNodePrioritySelector::OnTick(const BTNodeInputParam& input, BT
 	return bIsFinish;
 }
 
+class BTNodePriorityNotRecursionSelector : public BTNodePrioritySelector
+{
+public:
+	BTNodePriorityNotRecursionSelector(BTNode* parentNode) : BTNodePrioritySelector(parentNode) {}
+	virtual bool OnEvaluate(const BTNodeInputParam& input) final
+	{
+		bool ret = BTNodePrioritySelector::OnEvaluate(input);
+		if (m_precondition != nullptr)
+		{
+			// 走到这里证明前提条件已经通过，不需要子节点的递归结果参与判断
+			ret = true;
+		}
+		return ret;
+	}
+};
+
 class BTNodeNonePrioritySelector : public BTNodePrioritySelector
 {
 public:
-	BTNodeNonePrioritySelector(BTNode* parentNode, BTPrecondition* precondition = nullptr)
-		: BTNodePrioritySelector(parentNode, precondition){}
+	BTNodeNonePrioritySelector(BTNode* parentNode)
+		: BTNodePrioritySelector(parentNode){}
 	virtual bool OnEvaluate(const BTNodeInputParam& input);
 };
 bool BTNodeNonePrioritySelector::OnEvaluate(const BTNodeInputParam& input)
@@ -353,8 +316,8 @@ bool BTNodeNonePrioritySelector::OnEvaluate(const BTNodeInputParam& input)
 class BTNodeSequence : public BTNode
 {
 public:
-	BTNodeSequence(BTNode* parentNode, BTPrecondition* precondition = nullptr)
-		: BTNode(parentNode, precondition){}
+	BTNodeSequence(BTNode* parentNode)
+		: BTNode(parentNode){}
 	virtual bool OnEvaluate(const BTNodeInputParam& input);
 	virtual void OnTransition(const BTNodeInputParam& input);
 	virtual StatusBTRunning OnTick(const BTNodeInputParam& input, BTNodeOutputParam& output);
@@ -423,8 +386,8 @@ StatusBTRunning BTNodeSequence::OnTick(const BTNodeInputParam& input, BTNodeOutp
 class BTNodeTerminal : public BTNode
 {
 public:
-	BTNodeTerminal(BTNode* parentNode, BTPrecondition* precondition = nullptr)
-		: BTNode(parentNode, precondition){}
+	BTNodeTerminal(BTNode* parentNode)
+		: BTNode(parentNode){}
 	BTNodeTerminal& SetDynamicOnExecute(std::function<StatusBTRunning(const BTNodeInputParam& input, BTNodeOutputParam& output)> call)
 	{
 		m_dynamicOnExecute = call;
@@ -444,6 +407,10 @@ public:
 	virtual StatusBTRunning OnTick(const BTNodeInputParam& input, BTNodeOutputParam& output) override;
 
 protected:
+	virtual bool OnEvaluate(const BTNodeInputParam& input) final
+	{
+		return true;
+	}
 	virtual void OnEnter(const BTNodeInputParam& input) 
 	{
 		if (m_dynamicOnEnter != nullptr)
@@ -521,8 +488,8 @@ StatusBTRunning BTNodeTerminal::OnTick(const BTNodeInputParam& input, BTNodeOutp
 class BTNodeParallel : public BTNode
 {
 public:
-	BTNodeParallel(BTNode* parentNode, BTPrecondition* precondition = nullptr)
-		: BTNode(parentNode, precondition)
+	BTNodeParallel(BTNode* parentNode)
+		: BTNode(parentNode)
 	{
 		for (uint i = 0; i < BT_MaxBTChildNodeNum; ++i)
 			m_childNodeStatus[i] = StatusBTRunning::Executing;
@@ -617,8 +584,8 @@ class BTNodeLoop : public BTNode
 public:
 	static const int kInfiniteLoop = -1;
 public:
-	BTNodeLoop(BTNode* parentNode, BTPrecondition* precondition = nullptr, int loopCount = kInfiniteLoop)
-		: BTNode(parentNode, precondition)
+	BTNodeLoop(BTNode* parentNode, int loopCount = kInfiniteLoop)
+		: BTNode(parentNode)
 		, m_loopCount(loopCount)
 	{}
 	virtual bool OnEvaluate(const BTNodeInputParam& input);
@@ -716,7 +683,7 @@ public:
 	}
 	static BTNode& CreateLoopNode(BTNode* parent, const char* debugName, int loopCount)
 	{
-		BTNodeLoop* pReturn = new BTNodeLoop(parent, nullptr, loopCount);
+		BTNodeLoop* pReturn = new BTNodeLoop(parent, loopCount);
 		CreateNodeCommon(pReturn, parent, debugName);
 		return (*pReturn);
 	}

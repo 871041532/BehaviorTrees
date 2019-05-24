@@ -16,28 +16,40 @@ CFuncType2 = CFUNCTYPE(c_int)
 BOOL_FUNC = CFUNCTYPE(c_bool)
 def run1():
 	print("run1")
-	return False
+	return True
 def run2():
 	print("run2")
 	return True
-def judge1():
-	print("judge1")
+def ok():
+	print("ok")
+	return True
+def no():
+	print("no")
 	return False
 run1_func = CFuncType2(run1)
 run2_func = CFuncType2(run2)
-judge1_func = BOOL_FUNC(judge1)
+judge_ok = BOOL_FUNC(ok)
+judge_no = BOOL_FUNC(no)
 
 bt_lib.BTInit()
 root_node = bt_lib.CreateRootNode()
-run1_node = bt_lib.CreateTeminalNode(root_node, run1_func)
-run2_node = bt_lib.CreateTeminalNode(root_node, run2_func)
+
+selector1 = bt_lib.CreatePrioritySelectorNode(root_node)
+bt_lib.NodeSetPreCondition(selector1, judge_ok)
+
+selector2 = bt_lib.CreatePrioritySelectorNode(root_node)
+bt_lib.NodeSetPreCondition(selector2, judge_ok)
+
+action1 = bt_lib.CreateTeminalNode(selector1, run1_func)
+bt_lib.NodeSetPreCondition(action1, judge_no)
+
+action2 = bt_lib.CreateTeminalNode(selector2, run2_func)
+bt_lib.NodeSetPreCondition(action2, judge_ok)
 # condition1 = bt_lib.CreateCondition(judge1_func)
 # bt_lib.NodeSetPreCondition(run1_node, condition1)
-bt_lib.NodeSetDynamicCondition(run1_node, judge1_func)
+# bt_lib.NodeSetPreCondition(run1_node, judge_ok)
 bt_lib.TickOne(root_node)
-bt_lib.TickOne(root_node)
-bt_lib.TickOne(root_node)
-bt_lib.TickOne(root_node)
+# bt_lib.TickOne(root_node)
 bt_lib.BTDestory()
 
 

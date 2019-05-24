@@ -50,8 +50,7 @@ int main()
 
 	BTNode& root = BTNodeFactory::CreateSequenceNode(nullptr, "root");
 	BTNodeFactory::CreateTeminalNode<MoveAction>(&root, "MoveAction").SetDynamicOnExecute(MoveActionExecute2).SetDynamicOnEnter(MoveActionEnter2).SetDynamicOnExit(MoveActionExit2);
-	BTNodeFactory::CreateTeminalNode<JumpAction>(&root, "JumpActiontick")
-		.SetNodePrecondition(new BTPreconditionTrue());
+	BTNodeFactory::CreateTeminalNode<JumpAction>(&root, "JumpActiontick");
 	if (root.Evaluate(input))
 	{
 		root.Tick(input, output);
@@ -87,7 +86,7 @@ int main()
 	BTInit();
 	auto id = CreateRootNode();
 	auto id2 = CreateTeminalNode(id, run1);
-	NodeSetDynamicCondition(id2, judge);
+	NodeSetPreCondition(id2, judge);
 	TickAll();
 	BTDestory();
 

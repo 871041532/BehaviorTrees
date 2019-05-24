@@ -33,24 +33,18 @@ Export void TickAll()
 }
 Export uint CreateRootNode()
 {
-	BTNode* root = new BTNodeNonePrioritySelector(nullptr);
+	BTNode* root = new BTNodePrioritySelector(nullptr);
 	BTRootNodes[BTCurrentIndex] = root;
 	BTNormalNodes[BTCurrentIndex] = root;
 	return BTCurrentIndex++;
 }
 
-Export void NodeSetDynamicCondition(uint nodeId, bool(*dynamicjudge)())
+Export void NodeSetPreCondition(uint nodeId, bool(*dynamicjudge)())
 {
 	BTNode* node = BTNormalNodes[nodeId];
-	node->SetDynamicCondition(dynamicjudge);
+	node->SetPreCondition(dynamicjudge);
 }
 
-Export void NodeSetPreCondition(uint nodeId, uint conditionId)
-{
-	BTNode* node = BTNormalNodes[nodeId];
-	BTPrecondition* condition = ConditionNodes[conditionId];
-	node->SetNodePrecondition(condition);
-}
 Export uint CreateCondition(bool(*dynamicJudge)())
 {
 	ConditionNodes[BTCurrentIndex] = new BTPrecondition();

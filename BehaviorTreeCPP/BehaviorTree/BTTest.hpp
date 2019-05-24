@@ -243,10 +243,8 @@ public:
 		//init bev tree
 		BTNode& ret =
 			BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
-		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&ret, "move to")
-			.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
-		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
-			.SetNodePrecondition(new BTPreconditionTrue());
+		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&ret, "move to");
+		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle");
 		m_BevTreeRoot = &ret;
 	}
 	virtual void Tick(f32 _fDeltaTime)
@@ -315,15 +313,15 @@ protected:
 	{
 		//init bev tree
 		BTNode& ret = BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
-		BTNode& p = BTNodeFactory::CreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
-			.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
-		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&p, "move to")
-			.SetNodePrecondition(new BTPreconditionTrue());
-		BTNodeFactory::CreateTeminalNode<NOD_Breathe>(&p, "breathing")
-			.SetNodePrecondition(new BTPreconditionTrue());
-		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
-			.SetNodePrecondition(new BTPreconditionTrue());
-		m_BevTreeRoot = &ret;
+		//BTNode& p = BTNodeFactory::CreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
+		//	.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
+		//BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&p, "move to")
+		//	.SetNodePrecondition(new BTPreconditionTrue());
+		//BTNodeFactory::CreateTeminalNode<NOD_Breathe>(&p, "breathing")
+		//	.SetNodePrecondition(new BTPreconditionTrue());
+		//BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
+		//	.SetNodePrecondition(new BTPreconditionTrue());
+		//m_BevTreeRoot = &ret;
 	}
 	virtual const char* GetInfo() {
 		return "Example2: priority selector & parallel(mouse click to next sample)";
@@ -341,19 +339,19 @@ protected:
 	virtual void Create()
 	{
 		//init bev tree
-		BTNode& ret = BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
-		BTNode& p = BTNodeFactory::CreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
-			.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
-		BTNode& sq = BTNodeFactory::CreateSequenceNode(&p, "sequence");
-		BTNodeFactory::CreateTeminalNode<NOD_TurnTo>(&sq, "turn to")
-			.SetNodePrecondition(new BTPreconditionTrue());
-		BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&sq, "move to")
-			.SetNodePrecondition(new CON_HasFacedToTarget());
-		BTNodeFactory::CreateTeminalNode<NOD_Breathe>(&p, "breathing")
-			.SetNodePrecondition(new BTPreconditionTrue());
-		BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
-			.SetNodePrecondition(new BTPreconditionTrue());
-		m_BevTreeRoot = &ret;
+		//BTNode& ret = BTNodeFactory::CreatePrioritySelectorNode(NULL, "root");
+		//BTNode& p = BTNodeFactory::CreateParallelNode(&ret, E_ParallelFinishCondition::Or, "parallel")
+		//	.SetNodePrecondition(new BTPreconditionNot(new CON_HasReachedTarget()));
+		//BTNode& sq = BTNodeFactory::CreateSequenceNode(&p, "sequence");
+		//BTNodeFactory::CreateTeminalNode<NOD_TurnTo>(&sq, "turn to")
+		//	.SetNodePrecondition(new BTPreconditionTrue());
+		//BTNodeFactory::CreateTeminalNode<NOD_MoveTo>(&sq, "move to")
+		//	.SetNodePrecondition(new CON_HasFacedToTarget());
+		//BTNodeFactory::CreateTeminalNode<NOD_Breathe>(&p, "breathing")
+		//	.SetNodePrecondition(new BTPreconditionTrue());
+		//BTNodeFactory::CreateTeminalNode<NOD_Idle>(&ret, "idle")
+		//	.SetNodePrecondition(new BTPreconditionTrue());
+		//m_BevTreeRoot = &ret;
 	}
 	virtual void Tick(f32 _fDeltaTime)
 	{
