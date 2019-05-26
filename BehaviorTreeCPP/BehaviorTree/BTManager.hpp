@@ -15,7 +15,8 @@ BTNodeOutputParam* GlobalOutput = nullptr;
 Export void TickOne(uint rootId)
 {
 	BTNode* rootNode = BTRootNodes[rootId];
-	if (rootNode ->Evaluate(*GlobalInput))
+	BTGlobal::RECURSION_OK = true;
+	if (rootNode ->Evaluate(*GlobalInput) && BTGlobal::RECURSION_OK)
 	{
 		rootNode ->Tick(*GlobalInput, *GlobalOutput);
 	}
@@ -25,7 +26,8 @@ Export void TickAll()
 {
 	for (auto&& it : BTRootNodes)
 	{
-		if (it.second->Evaluate(*GlobalInput))
+		BTGlobal::RECURSION_OK = true;
+		if (it.second->Evaluate(*GlobalInput) && BTGlobal::RECURSION_OK)
 		{
 			it.second->Tick(*GlobalInput, *GlobalOutput);
 		}
@@ -90,6 +92,15 @@ Export uint CreatePrioritySelectorNode(uint parentId)
 {
 	BTNode* parent = BTNormalNodes[parentId];
 	auto node = new BTNodePrioritySelector(parent);
+	parent->AddChildNode(node);
+	BTNormalNodes[BTCurrentIndex] = node;
+	return BTCurrentIndex++;
+}
+
+Export uint CreateNoRecursionPrioritySelectorNode(uint parentId)
+{
+	BTNode* parent = BTNormalNodes[parentId];
+	auto node = new BTNodeNoRecursionPrioritySelector(parent);
 	parent->AddChildNode(node);
 	BTNormalNodes[BTCurrentIndex] = node;
 	return BTCurrentIndex++;

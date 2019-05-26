@@ -27,6 +27,12 @@ enum class StausNodeTerminal
 
 typedef AnyData BTNodeInputParam;
 typedef AnyData BTNodeOutputParam;
+static class BTGlobal
+{
+public:
+	static bool RECURSION_OK;
+};
+bool BTGlobal::RECURSION_OK = true;
 
 class BTPrecondition
 {
@@ -277,16 +283,23 @@ StatusBTRunning BTNodePrioritySelector::OnTick(const BTNodeInputParam& input, BT
 	return bIsFinish;
 }
 
-class BTNodePriorityNotRecursionSelector : public BTNodePrioritySelector
+// 在Evaluate时如果precondition过了就认为是true
+// 如果子节点Evaluate不过，那么树tick时不执行
+class BTNodeNoRecursionPrioritySelector : public BTNodePrioritySelector
 {
 public:
-	BTNodePriorityNotRecursionSelector(BTNode* parentNode) : BTNodePrioritySelector(parentNode) {}
+	BTNodeNoRecursionPrioritySelector(BTNode* parentNode) : BTNodePrioritySelector(parentNode) {}
 	virtual bool OnEvaluate(const BTNodeInputParam& input) final
 	{
 		bool ret = BTNodePrioritySelector::OnEvaluate(input);
 		if (m_precondition != nullptr)
 		{
 			// 走到这里证明前提条件已经通过，不需要子节点的递归结果参与判断
+			if (!ret)
+			{
+				// 如果子节点evaluate没过，那么这个树本次tick不执行
+				BTGlobal::RECURSION_OK = false;
+			}
 			ret = true;
 		}
 		return ret;

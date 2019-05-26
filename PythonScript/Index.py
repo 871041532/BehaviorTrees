@@ -34,14 +34,14 @@ judge_no = BOOL_FUNC(no)
 bt_lib.BTInit()
 root_node = bt_lib.CreateRootNode()
 
-selector1 = bt_lib.CreatePrioritySelectorNode(root_node)
+selector1 = bt_lib.CreateNoRecursionPrioritySelectorNode(root_node)
 bt_lib.NodeSetPreCondition(selector1, judge_ok)
 
-selector2 = bt_lib.CreatePrioritySelectorNode(root_node)
+selector2 = bt_lib.CreateNoRecursionPrioritySelectorNode(root_node)
 bt_lib.NodeSetPreCondition(selector2, judge_ok)
 
 action1 = bt_lib.CreateTeminalNode(selector1, run1_func)
-bt_lib.NodeSetPreCondition(action1, judge_no)
+bt_lib.NodeSetPreCondition(action1, judge_ok)
 
 action2 = bt_lib.CreateTeminalNode(selector2, run2_func)
 bt_lib.NodeSetPreCondition(action2, judge_ok)
