@@ -7,8 +7,7 @@ using namespace std;
 
 unordered_map<uint, BTNode*> BTRootNodes;
 unordered_map<uint, BTNode*> BTNormalNodes;
-unordered_map<uint, BTPrecondition*> ConditionNodes;
-uint BTCurrentIndex;
+uint BTCurrentIndex = 1;
 BTNodeInputParam* GlobalInput = nullptr;
 BTNodeOutputParam* GlobalOutput = nullptr;
 
@@ -47,12 +46,6 @@ Export void NodeSetPreCondition(uint nodeId, bool(*dynamicjudge)())
 	node->SetPreCondition(dynamicjudge);
 }
 
-Export uint CreateCondition(bool(*dynamicJudge)())
-{
-	ConditionNodes[BTCurrentIndex] = new BTPrecondition();
-	ConditionNodes[BTCurrentIndex]->SetDynamicJudge([dynamicJudge](const BTNodeInputParam& input) ->bool {return dynamicJudge();});
-	return BTCurrentIndex++;
-}
 Export uint CreateTeminalNode(uint parentId, int(*dynamicOnExcute)())
 {
 	BTNode* parent = BTNormalNodes[parentId];
@@ -128,27 +121,11 @@ Export void BTDestory()
 	}
 	BTRootNodes.clear();
 	BTNormalNodes.clear();  // 原始设计，子节点由父节点来清理
-	for (auto&& it : ConditionNodes)
-	{
-		delete it.second;
-	}
-	ConditionNodes.clear();
 }
 
-Export void fun0()
+Export void BTDestoryOne(uint rootId)
 {
-	cout << "fun0" << endl;
-}
-
-Export void fun1(int a)
-{
-	cout << a << endl;
-}
-
-Export void fun2(int(*call)(int, int))
-{
-	function<int(int, int)> temp = call;
-	int result = temp(2, 3);
-	cout << result << endl;
+	delete BTRootNodes[rootId];
+	BTRootNodes.erase(rootId);
 }
 
