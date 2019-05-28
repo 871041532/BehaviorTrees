@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\zhoukaibing\Desktop\demo.ui'
-#
-# Created by: PyQt5 UI code generator 5.11.3
-#
-# WARNING! All changes made in this file will be lost!
-
 import sys 
 from PyQt5.QtWidgets import QPushButton, QApplication, QMainWindow, QFileDialog, QToolTip, QDialog
 from PyQt5.QtGui import QIcon, QFont
@@ -14,6 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets
+from NodeWidget import BaseNode
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -61,7 +56,6 @@ class Ui_MainWindow(object):
 
 
 class MainForm(QMainWindow, Ui_MainWindow):
-    """docstring for MainForm"""
     def __init__(self):
         super(MainForm, self).__init__()
         self.setupUi(self)
@@ -70,32 +64,53 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.actionSave.triggered.connect(self.on_save_file)
 
         self.context = QWidget()
-        self.context.setMinimumSize(1000, 1000)
+        self.context.setGeometry(0, 0, 1000, 1000)
+        # self.context.setMinimumSize(1000, 1000)
+        # self.scroll_area = QScrollArea()
+        # self.scroll_area.setWidget(self.context)
+        self.gridLayout_3.addWidget(self.context)
+        mainWindowColor = "background-color:#CCCCCC"
+        self.context.setStyleSheet(mainWindowColor)
 
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidget(self.context)
-        self.gridLayout_3.addWidget(self.scroll_area)
-    
+        # data
+        self.data = None
+        self.nodes = []
+        self.on_open_file()
+        self.create_base_node(self.data, 0, 0)
+
+    def create_base_node(self, data, cur_row, cur_col):
+        node = BaseNode(self.context)
+        node.move(cur_row * node.get_width(), cur_col * node.get_height())
+        node.set_data(data)
+        self.nodes.append(node)
+
+
     def on_open_file(self):
+        file_path = "tree1.json"
+        file = open(file_path, "r", encoding='UTF-8')
+        strs = file.read()
+        self.data = eval(strs)
+        file.close()
         print ("on_open_file")
-    
+
     def on_save_file(self):
         print ("on_save_file")
-    
+
     def on_create_file(self):
         print ("on_create_file")
-        
+
     def paintEvent(self, event):
-        painter = QPainter(self)
-        color = QColor(0xDDDDDF)
-        painter.fillRect(0, 0, self.width(), self.height(), color)
-        pen = QPen()
-        pen.setStyle(Qt.SolidLine)
-        pen.setWidth(3)
-        pen.setBrush(Qt.white)
-        painter.setPen(pen)
-        painter.drawLine(10, 50, 310, 350)
-        painter.end()
+        pass
+        # painter = QPainter(self)
+        # color = QColor(0xDDDDDF)
+        # painter.fillRect(0, 0, self.width(), self.height(), color)
+        # pen = QPen()
+        # pen.setStyle(Qt.SolidLine)
+        # pen.setWidth(3)
+        # pen.setBrush(Qt.white)
+        # painter.setPen(pen)
+        # painter.drawLine(10, 50, 310, 350)
+        # painter.end()
 
 if __name__ == '__main__': 
     app = QApplication(sys.argv) 

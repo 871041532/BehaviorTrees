@@ -21,3 +21,4 @@ PythonScript/__pycache__/
 BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
 PythonScript/Editor/.idea/
 BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
+PythonScript/Editor/__pycache__/NodeWidget.cpython-37.pyc
