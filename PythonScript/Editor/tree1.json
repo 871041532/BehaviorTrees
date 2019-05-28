@@ -1,0 +1,33 @@
+{
+	"Description": "根节点",
+	"Name":"树1",
+	"Type":"RootNode",
+	"Children":[
+		{
+			"Name":"分支1",
+			"Type":"PrioritySelectorNode",
+			"Conditions":["ok"],
+			"Children":[
+				{
+					"Name":"行为1",
+					"Type":"TeminalNode",
+					"Conditions":["ok", "no"],
+					"Action":"run1"
+				}
+			]
+		},
+		{
+			"Name":"分支2",
+			"Type":"PrioritySelectorNode",
+			"Conditions":["ok"],
+			"Children":[
+				{
+					"Name":"行为2",
+					"Type":"TeminalNode",
+					"Conditions":["ok"],
+					"Action":"run2"
+				}
+			]
+		}
+	]
+}

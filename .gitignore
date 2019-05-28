@@ -19,3 +19,5 @@ BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
 PythonScript/.idea/
 PythonScript/__pycache__/
 BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
+PythonScript/Editor/.idea/
+BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
