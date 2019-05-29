@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
 
@@ -16,6 +16,7 @@ COLORS = {
 }
 
 class BaseNode(QtWidgets.QWidget):
+    clicked = pyqtSignal(dict, QWidget)
     def __init__(self, parent):
         super(BaseNode, self).__init__(parent)
         # self.setMinimumSize(self.get_width(), self.get_height())
@@ -26,7 +27,7 @@ class BaseNode(QtWidgets.QWidget):
         self.name_label = QLabel(self)
         self.name_label.setText("default")
         self.name_label.setAlignment(Qt.AlignCenter)
-        self.name_label.setStyleSheet("font:12pt '微软雅黑';border-width: 1px;color:rgb(30,30,30);")  # border-style: solid;border-color: rgb(0, 0, 0);
+        self.name_label.setStyleSheet("font:10pt '微软雅黑';border-width: 1px;color:rgb(30,30,30);")  # border-style: solid;border-color: rgb(0, 0, 0);
         self.name_label.setWordWrap(True)
         self.layout.addWidget(self.name_label)
         self.data = None
@@ -34,6 +35,9 @@ class BaseNode(QtWidgets.QWidget):
         # 父节点
         self.parent_node = None
         self.show()
+
+    def mousePressEvent(self, event):
+        self.clicked.emit(self.data, self)
 
     def set_data(self, data, parent_node):
         self.data = data
@@ -43,13 +47,17 @@ class BaseNode(QtWidgets.QWidget):
         self.name_label.setText(name)
         self.setStyleSheet(color)
         self.parent_node = parent_node
+
+    def refresh_show(self):
+        if self.data:
+            self.name_label.setText(self.data["Name"])
     
     @staticmethod
     def get_static_width():
-        return 100
+        return 150
 
     def get_width(self):
-        return 100
+        return 150
 
     def get_height(self):
         return 70

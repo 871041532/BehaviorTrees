@@ -9,11 +9,12 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets
 from NodeWidget import BaseNode
+from MyDockWidget import MyDockWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(705, 596)
+        MainWindow.resize(1000, 596)
         MainWindow.setToolTip("")
         MainWindow.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -71,7 +72,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.gridLayout_3.addWidget(self.context)
         import qdarkstyle
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-
+        self.property_win = MyDockWidget(self.tr("属性窗口"), self)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.property_win)
         # data
         self.file_path = None
         self.data = None
@@ -128,6 +130,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         
         # 创建node
         node = BaseNode(self.context)
+        node.clicked.connect(self.property_win.receive_click_node)
         node.move(self.row_node_nums[cur_row] * node.get_width(), cur_row * node.get_height())
         node.set_data(data, parent_node)
         self.row_nodes[cur_row].append(node)
