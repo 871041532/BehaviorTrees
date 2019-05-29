@@ -69,48 +69,114 @@ class MainForm(QMainWindow, Ui_MainWindow):
         # self.scroll_area = QScrollArea()
         # self.scroll_area.setWidget(self.context)
         self.gridLayout_3.addWidget(self.context)
-        mainWindowColor = "background-color:#CCCCCC"
-        self.context.setStyleSheet(mainWindowColor)
+        import qdarkstyle
+        self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 
         # data
+        self.file_path = None
         self.data = None
-        self.nodes = []
-        self.on_open_file()
-        self.create_base_node(self.data, 0, 0)
+        self.row_node_nums = {}
+        self.row_nodes = {}  # 0:[0, 1, 2]
+        self.max_col_count = 0
 
-    def create_base_node(self, data, cur_row, cur_col):
-        node = BaseNode(self.context)
-        node.move(cur_row * node.get_width(), cur_col * node.get_height())
-        node.set_data(data)
-        self.nodes.append(node)
-
-
-    def on_open_file(self):
-        file_path = "tree1.json"
-        file = open(file_path, "r", encoding='UTF-8')
+        self.file_path = "tree1.json"
+        file = open(self.file_path, "r", encoding='UTF-8')
         strs = file.read()
         self.data = eval(strs)
         file.close()
-        print ("on_open_file")
+        self.refresh_all()
+        
+        def paintEvent(widget, row_nodes,event):
+            painter = QPainter(widget)
+            pen = QPen(Qt.white, 4, Qt.SolidLine)
+            painter.setPen(pen)
+            for nodes in row_nodes.values():
+                for node in nodes:
+                    x1 = node.x() + node.get_width() / 2
+                    y1 = node.y() + node.get_height() / 2
+                    if node.parent_node:
+                        x2 = node.parent_node.x() + node.parent_node.get_width() / 2
+                        y2 = node.parent_node.y() + node.parent_node.get_height() / 2
+                        painter.drawLine(x1, y1, x2, y2)
+            painter.end()
+        from functools import partial
+        self.context.paintEvent = partial(paintEvent, self.context, self.row_nodes)
+    
+    def refresh_all(self):
+        self.row_node_nums.clear()
+        for nodes in self.row_nodes.values():
+            for node in nodes:
+                node.hide()
+                node = None
+        self.row_nodes.clear()
+        self.max_col_count = 0
+        self.create_nodes(None, self.data, 0)
+        self.set_nodes_position()
+        
+    def set_nodes_position(self):
+        all_width = self.max_col_count * (BaseNode.get_static_width() + 20)
+        for row, nodes in self.row_nodes.items():
+            piece_width = all_width / (len(nodes) + 1)
+            for col, node in enumerate(nodes):
+                node.move((col + 1) * piece_width, row * (node.get_height() + 10))
+    
+    def create_nodes(self, parent_node, data, cur_row):
+        if cur_row not in self.row_node_nums:
+            self.row_node_nums[cur_row] = 0
+        if cur_row not in self.row_nodes:
+            self.row_nodes[cur_row] = []
+        
+        # 创建node
+        node = BaseNode(self.context)
+        node.move(self.row_node_nums[cur_row] * node.get_width(), cur_row * node.get_height())
+        node.set_data(data, parent_node)
+        self.row_nodes[cur_row].append(node)
+        self.row_node_nums[cur_row] += 1
+        self.max_col_count = self.max_col_count if self.max_col_count > self.row_node_nums[cur_row] else self.row_node_nums[cur_row]
+        #children
+        if "Children" not in data:
+            data["Children"] = []
+        children_data = data["Children"]
+        for child_data in children_data:
+            self.create_nodes(node, child_data, cur_row + 1)
+
+    def on_open_file(self):
+        self.file_path = QFileDialog.getOpenFileName(self, "Open File","./", "Json files(*.json)")[0]
+        if self.file_path:
+            file = open(self.file_path, "r", encoding='UTF-8')
+            strs = file.read()
+            self.data = eval(strs)
+            file.close()
+            self.refresh_all()
+            self.statusbar.showMessage("已加载：" + self.file_path)
 
     def on_save_file(self):
-        print ("on_save_file")
+        if self.file_path:
+            file2 = open(self.file_path, "w", encoding='UTF-8')
+            dict_str = str(self.data)
+            file2.write(dict_str.replace("\'","\""))
+            file2.close()
+            self.statusbar.showMessage("已保存：" + self.file_path)
+        else:
+            self.statusbar.showMessage("请先创建或打开一个文件")
 
     def on_create_file(self):
-        print ("on_create_file")
+        self.file_path = "default.json"
+        self.data = {
+            "Type": "RootNode",
+            "Name": "默认根节点",
+        }
+        self.refresh_all()
 
     def paintEvent(self, event):
-        pass
-        # painter = QPainter(self)
-        # color = QColor(0xDDDDDF)
-        # painter.fillRect(0, 0, self.width(), self.height(), color)
-        # pen = QPen()
-        # pen.setStyle(Qt.SolidLine)
-        # pen.setWidth(3)
-        # pen.setBrush(Qt.white)
-        # painter.setPen(pen)
-        # painter.drawLine(10, 50, 310, 350)
-        # painter.end()
+        painter = QPainter(self.context)
+        pen = QPen()
+        pen.setColor(QColor(0xFFFFFF))
+        pen.setStyle(Qt.SolidLine)
+        pen.setWidth(3)
+        pen.setBrush(Qt.white)
+        painter.drawLine(-100, -100, 50, 50)
+        painter.end()
 
 if __name__ == '__main__': 
     app = QApplication(sys.argv) 
