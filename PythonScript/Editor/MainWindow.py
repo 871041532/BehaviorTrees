@@ -117,10 +117,11 @@ class MainForm(QMainWindow, Ui_MainWindow):
         
     def set_nodes_position(self):
         all_width = self.max_col_count * (BaseNode.get_static_width() + 20)
+        offset_x = - BaseNode.get_static_width() / 1.5
         for row, nodes in self.row_nodes.items():
             piece_width = all_width / (len(nodes) + 1)
             for col, node in enumerate(nodes):
-                node.move((col + 1) * piece_width, row * (node.get_height() + 10))
+                node.move((col + 1) * piece_width + offset_x, row * (node.get_height() + 10))
     
     def create_nodes(self, parent_node, data, cur_row):
         if cur_row not in self.row_node_nums:

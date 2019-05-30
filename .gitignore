@@ -22,3 +22,4 @@ BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
 PythonScript/Editor/.idea/
 BehaviorTreeCPP/BehaviorTree/BehaviorTree.vcxproj
 PythonScript/Editor/__pycache__/NodeWidget.cpython-37.pyc
+PythonScript/Editor/__pycache__/MyDockWidget.cpython-37.pyc

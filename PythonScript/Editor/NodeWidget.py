@@ -76,7 +76,7 @@ class BaseNode(QtWidgets.QWidget):
                pass
             else:
                 # 椭圆
-                self.resize(self.get_width() - 10, self.get_height() - 10)
+                self.resize(self.get_width() - 15, self.get_height() - 15)
                 painter.drawEllipse(0, 0, self.width(), self.height())
                 painter.drawLine(0, 0, 50, 50)
             painter.end()
