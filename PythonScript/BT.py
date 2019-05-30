@@ -15,6 +15,12 @@ LIB_CREATE_TYPES = {
     "SequenceNode": lambda parent_node: bt_lib.CreateSequenceNode(parent_node),
 }
 
+LIB_COMPOSITE_NODES = [
+    "PrioritySelectorNode",
+    "NoRecursionPrioritySelectorNode",
+    "SequenceNode"
+]
+
 
 class Tree(object):
     def __init__(self, json_data):
@@ -31,6 +37,8 @@ class Tree(object):
 
     def build_normal(self, parent_node, children_data_list, path_param):
         for child_data in children_data_list:
+            if not child_data:
+                continue
             type = child_data["Type"]
             path = "%s-%s" % (path_param, child_data["Name"])
             if type != TERMINAL_NODE:
@@ -67,9 +75,9 @@ class Tree(object):
             def final_condition(p, cs):
                 for c in cs:
                     if not c():
-                        print("Evalute False:%s" % p)
+                        print("pre Evalute False:%s" % p)
                         return False
-                print("Evalute True:%s" % p)
+                print("pre Evalute True:%s" % p)
                 return True
 
             temp_func = BT.to_bool_cfunc(partial(final_condition, path, conditions))

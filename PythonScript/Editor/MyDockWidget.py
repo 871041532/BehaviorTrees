@@ -24,6 +24,8 @@ class MyDockWidget(QtWidgets.QDockWidget):
         # 类型
         temp_layout = QHBoxLayout()
         self.type_label = QLabel("Type:")
+        self.type_label.setMaximumWidth(250)
+        self.type_label.setWordWrap(True)
         # temp_layout.addWidget(self.type_label)
         self.layout.addWidget(self.type_label)
 

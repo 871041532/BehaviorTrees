@@ -95,7 +95,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
             for nodes in row_nodes.values():
                 for node in nodes:
                     x1 = node.x() + node.get_width() / 2
-                    y1 = node.y() + node.get_height() / 2
+                    y1 = node.y() + 12 # + node.get_height() / 2
                     if node.parent_node:
                         x2 = node.parent_node.x() + node.parent_node.get_width() / 2
                         y2 = node.parent_node.y() + node.parent_node.get_height() / 2
@@ -116,8 +116,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.set_nodes_position()
         
     def set_nodes_position(self):
-        all_width = self.max_col_count * (BaseNode.get_static_width() + 20)
-        offset_x = - BaseNode.get_static_width() / 1.5
+        all_width = (self.max_col_count + 1) * (BaseNode.get_static_width())
+        offset_x = - BaseNode.get_static_width()
         for row, nodes in self.row_nodes.items():
             piece_width = all_width / (len(nodes) + 1)
             for col, node in enumerate(nodes):
@@ -134,6 +134,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         node.clicked.connect(self.property_win.receive_click_node)
         node.move(self.row_node_nums[cur_row] * node.get_width(), cur_row * node.get_height())
         node.set_data(data, parent_node)
+        node.after_operationed.connect(self.refresh_all)
         self.row_nodes[cur_row].append(node)
         self.row_node_nums[cur_row] += 1
         self.max_col_count = self.max_col_count if self.max_col_count > self.row_node_nums[cur_row] else self.row_node_nums[cur_row]
@@ -142,7 +143,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
             data["Children"] = []
         children_data = data["Children"]
         for child_data in children_data:
-            self.create_nodes(node, child_data, cur_row + 1)
+            if child_data:
+                self.create_nodes(node, child_data, cur_row + 1)
 
     def on_open_file(self):
         self.file_path = QFileDialog.getOpenFileName(self, "Open File","./", "Json files(*.json)")[0]

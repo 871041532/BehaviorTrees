@@ -89,6 +89,10 @@ int main()
 	NodeSetPreCondition(id2, judge);
 	TickAll();
 	BTDestory();
-
+	char temp_char = '9';
+	int r = temp_char - '0';
+	cout << r << endl;
+	cout << (int)'9' << endl;
+	cout << (int)'0' << endl;
 	system("pause");
 }

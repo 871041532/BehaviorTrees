@@ -71,10 +71,13 @@ tree_data2 = {
 		}
 	]
 }
+file = open("Editor/tree1.json", "r", encoding='UTF-8')
+strs = file.read()
+file.close()
 
 BT.init_bt()
-tree1 = Tree(str(tree_data1))
-tree2 = Tree(str(tree_data2))
+tree1 = Tree(strs)
+# tree2 = Tree(str(tree_data2))
 BT.tick_all()
 BT.destory_bt()
 
