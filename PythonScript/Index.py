@@ -79,6 +79,9 @@ BT.init_bt()
 tree1 = Tree(strs)
 # tree2 = Tree(str(tree_data2))
 BT.tick_all()
+BT.tick_all()
+BT.tick_all()
+BT.tick_all()
 BT.destory_bt()
 
 

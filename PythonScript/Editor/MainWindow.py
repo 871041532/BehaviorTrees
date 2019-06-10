@@ -88,6 +88,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         file.close()
         self.refresh_all()
         
+        # 父子节点间画线
         def paintEvent(widget, row_nodes,event):
             painter = QPainter(widget)
             pen = QPen(Qt.white, 4, Qt.SolidLine)
@@ -170,7 +171,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.file_path = "default.json"
         self.data = {
             "Type": "RootNode",
-            "Name": "默认根节点",
+            "Name": "开始",
         }
         self.refresh_all()
 

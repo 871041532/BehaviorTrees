@@ -21,6 +21,13 @@ COLORS = {
     "TeminalNode": ("F08080", QColor(0xF08080)),
 }
 
+DEFAULT_NAME = {
+    "PrioritySelectorNode":"选择",
+    "NoRecursionPrioritySelectorNode":"决策选择",
+    "SequenceNode":"顺序",
+    "TeminalNode":"动作",
+}
+
 class BaseNode(QtWidgets.QWidget):
     clicked = pyqtSignal(dict, QWidget)
     after_operationed = pyqtSignal()
@@ -53,23 +60,18 @@ class BaseNode(QtWidgets.QWidget):
             menu.addMenu(menu2)
             menu2.setStyleSheet(child_style)
             for node_name in LIB_COMPOSITE_NODES:
-                menu2.addAction(QAction(node_name, self, triggered=partial(self.on_add_composite_node, node_name)))
-
-            add_action = QAction("添加组合节点", self, triggered=self.on_add_composite_node)
-            menu.addAction(add_action)
-            modify_action = QAction("添加动作节点", self, triggered=self.on_add_terminal_node)
-            menu.addAction(modify_action)
+                menu2.addAction(QAction("%s %s"%(DEFAULT_NAME[node_name], node_name), self, triggered=partial(self.on_add_composite_node, node_name)))
+            
+            menu3 = QMenu("添加动作节点")
+            menu3.setStyleSheet(child_style)
+            menu.addMenu(menu3)
+            for node_name in BT.actions.keys():
+                doc = BT.action_docs[node_name]
+                menu3.addAction(QAction(doc, self, triggered=partial(self.on_add_terminal_node, node_name)))
+            
         if self.type != "RootNode":
             remove_action = QAction("删除", self, triggered=self.on_remove_this_node)
             menu.addAction(remove_action)
-
-        # # 添加新测试menu
-        # menu2 = QMenu("测试")
-        # menu2.setStyleSheet()
-        # menu.addMenu(menu2)
-        # for i in range(0, 200):
-        #     menu2.addAction(QAction("测试1", self, triggered=self.on_add_composite_node))
-        #     menu2.addAction(QAction("测试2", self, triggered=self.on_add_composite_node))
 
         menu.exec_(QCursor.pos())
 
@@ -79,13 +81,22 @@ class BaseNode(QtWidgets.QWidget):
             self.data["Children"] = []
         self.data["Children"].append({
             "Type":node_name,
-            "Name":"默认",
+            "Name":DEFAULT_NAME[node_name],
         })
         self.after_operationed.emit()
 
     # 添加最终节点动作
-    def on_add_terminal_node(self):
-        pass
+    def on_add_terminal_node(self, node_name):
+        doc = BT.action_docs[node_name]
+        if "Children" not in self.data:
+            self.data["Children"] = []
+        self.data["Children"].append({
+            "Type":"TeminalNode",
+            "Name":doc,
+            "Action":node_name,
+            "Description":"%s %s"%(doc, node_name)
+        })
+        self.after_operationed.emit()
 
     # 删除
     def on_remove_this_node(self):

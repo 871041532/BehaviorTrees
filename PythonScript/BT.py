@@ -94,6 +94,7 @@ class BT(object):
     C_BOOL_CFUNC = CFUNCTYPE(c_bool)
     conditions = {}
     actions = {}
+    action_docs = {}
 
     @classmethod
     def init_bt(cls):
@@ -121,6 +122,7 @@ class BT(object):
     @classmethod
     def collect_action(cls, func):
         cls.actions[func.__name__] = func
+        cls.action_docs[func.__name__] = func.__doc__
         return func
 
     @classmethod

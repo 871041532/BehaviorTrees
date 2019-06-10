@@ -1,46 +1,50 @@
 import sys
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
+class ComboxDemo(QWidget):
+    def __init__(self,parent=None):
+        super(ComboxDemo, self).__init__(parent)
+        #设置标题
+        self.setWindowTitle('ComBox例子')
+        #设置初始界面大小
+        self.resize(300,90)
 
-class DockDemo(QMainWindow):
-    def __init__(self, parent=None):
-        super(DockDemo, self).__init__(parent)
-        layout = QHBoxLayout()
+        #垂直布局
+        layout=QVBoxLayout()
+        #创建标签，默认空白
+        self.btn1=QLabel('')
 
-        # 菜单栏，对于本例中核心内容的展示无影响，可删去
-        bar = self.menuBar()
-        file = bar.addMenu("File")
-        file.addAction("New")
-        file.addAction("save")
-        file.addAction("quit")
+        #实例化QComBox对象
+        self.cb=QComboBox()
+        #单个添加条目
+        self.cb.addItem('C')
+        self.cb.addItem('C++')
+        self.cb.addItem('Python')
+        #多个添加条目
+        self.cb.addItems(['Java','C#','PHP'])
+        #当下拉索引发生改变时发射信号触发绑定的事件
+        self.cb.currentIndexChanged.connect(self.selectionchange)
 
-        # 创建可停靠的窗口
-        self.items = QDockWidget("Dockable", self)
-
-        # 在停靠窗口内添加QListWidget对象
-        self.listWidget = QListWidget()
-        self.listWidget.addItem("item1")
-        self.listWidget.addItem("item2")
-        self.listWidget.addItem("item3")
-        self.items.setWidget(self.listWidget)
-
-        # 是否将可停靠窗口置于浮动状态，默认是False，下面这句删掉不影响显示结果
-        self.items.setFloating(False)
-
-        # 中央控件
-        self.setCentralWidget(QTextEdit())
-
-        # 将停靠窗口放在中央控件的右侧
-        self.addDockWidget(Qt.RightDockWidgetArea, self.items)
-
+        #控件添加到布局中，设置布局
+        layout.addWidget(self.cb)
+        layout.addWidget(self.btn1)
         self.setLayout(layout)
-        self.setWindowTitle("Dock 例子")
 
+    def selectionchange(self,i):
+        #标签用来显示选中的文本
+        #currentText()：返回选中选项的文本
+        self.btn1.setText(self.cb.currentText())
+        print('Items in the list are:')
+        #输出选项集合中每个选项的索引与对应的内容
+        #count()：返回选项集合中的数目
+        for count in range(self.cb.count()):
+            print('Item'+str(count)+'='+self.cb.itemText(count))
+            print('current index',i,'selection changed',self.cb.currentText())
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    demo = DockDemo()
-    demo.show()
+    app=QApplication(sys.argv)
+    comboxDemo=ComboxDemo()
+    comboxDemo.show()
     sys.exit(app.exec_())
