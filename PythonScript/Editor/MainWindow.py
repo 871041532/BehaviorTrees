@@ -64,12 +64,12 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.actionNew.triggered.connect(self.on_create_file)
         self.actionSave.triggered.connect(self.on_save_file)
 
-        self.context = QWidget()
-        self.context.setGeometry(0, 0, 1000, 1000)
+        self.context = QWidget(self)
+        # self.context.setGeometry(0, 0, 1000, 1000)
         # self.context.setMinimumSize(1000, 1000)
-        # self.scroll_area = QScrollArea()
-        # self.scroll_area.setWidget(self.context)
-        self.gridLayout_3.addWidget(self.context)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidget(self.context)
+        self.gridLayout_3.addWidget(self.scroll_area)
         import qdarkstyle
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self.property_win = MyDockWidget(self.tr("属性窗口"), self)
@@ -91,7 +91,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         # 父子节点间画线
         def paintEvent(widget, row_nodes,event):
             painter = QPainter(widget)
-            pen = QPen(Qt.white, 4, Qt.SolidLine)
+            pen = QPen(Qt.white, 2, Qt.SolidLine)
             painter.setPen(pen)
             for nodes in row_nodes.values():
                 for node in nodes:
@@ -118,11 +118,15 @@ class MainForm(QMainWindow, Ui_MainWindow):
         
     def set_nodes_position(self):
         all_width = (self.max_col_count + 1) * (BaseNode.get_static_width())
+        all_height = 0
         offset_x = - BaseNode.get_static_width()
         for row, nodes in self.row_nodes.items():
             piece_width = all_width / (len(nodes) + 1)
             for col, node in enumerate(nodes):
-                node.move((col + 1) * piece_width + offset_x, row * (node.get_height() + 10))
+                all_height = row * (node.get_height() + 10)
+                node.move((col + 1) * piece_width + offset_x, all_height)
+        self.context.setGeometry(0, 0, all_width - 100, all_height + 100)
+        self.context.setMinimumSize(all_width - 100, all_height + 100)
     
     def create_nodes(self, parent_node, data, cur_row):
         if cur_row not in self.row_node_nums:

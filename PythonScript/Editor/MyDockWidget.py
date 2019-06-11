@@ -9,6 +9,10 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets
 from NodeWidget import BaseNode
+from BT import BT
+
+ALL_CONDITIONS = list(BT.conditions.keys())
+ALL_CONDITIONS.insert(0, "无")
 
 class MyDockWidget(QtWidgets.QDockWidget):
     property_changed = pyqtSignal()
@@ -45,29 +49,34 @@ class MyDockWidget(QtWidgets.QDockWidget):
         self.description_edit = QTextEdit("")
         self.description_edit.textChanged.connect(self.value_changed)
         # c1
-        self.condition_label1 = QLabel("condition1:")
-        self.condition_edit1 = QLineEdit("")
-        self.condition_edit1.textChanged.connect(self.value_changed)
+        self.condition_label1 = QLabel("条件1:")
+        self.condition_edit1 = QComboBox()
+        self.condition_edit1.addItems(ALL_CONDITIONS)
+        self.condition_edit1.currentIndexChanged.connect(self.value_changed)
         self.condition_edits.append(self.condition_edit1)
         # c2
-        self.condition_label2 = QLabel("condition2:")
-        self.condition_edit2 = QLineEdit("")
-        self.condition_edit2.textChanged.connect(self.value_changed)
+        self.condition_label2 = QLabel("条件2:")
+        self.condition_edit2 = QComboBox()
+        self.condition_edit2.addItems(ALL_CONDITIONS)
+        self.condition_edit2.currentIndexChanged.connect(self.value_changed)
         self.condition_edits.append(self.condition_edit2)
         # c3
-        self.condition_label3 = QLabel("condition3:")
-        self.condition_edit3 = QLineEdit("")
-        self.condition_edit3.textChanged.connect(self.value_changed)
+        self.condition_label3 = QLabel("条件3:")
+        self.condition_edit3 = QComboBox()
+        self.condition_edit3.addItems(ALL_CONDITIONS)
+        self.condition_edit3.currentIndexChanged.connect(self.value_changed)
         self.condition_edits.append(self.condition_edit3)
         # c4
-        self.condition_label4 = QLabel("condition4:")
-        self.condition_edit4 = QLineEdit("")
-        self.condition_edit4.textChanged.connect(self.value_changed)
+        self.condition_label4 = QLabel("条件4:")
+        self.condition_edit4 = QComboBox()
+        self.condition_edit4.addItems(ALL_CONDITIONS)
+        self.condition_edit4.currentIndexChanged.connect(self.value_changed)
         self.condition_edits.append(self.condition_edit4)
         # c5
-        self.condition_label5 = QLabel("condition5:")
-        self.condition_edit5 = QLineEdit("")
-        self.condition_edit5.textChanged.connect(self.value_changed)
+        self.condition_label5 = QLabel("条件5:")
+        self.condition_edit5 = QComboBox()
+        self.condition_edit5.addItems(ALL_CONDITIONS)
+        self.condition_edit5.currentIndexChanged.connect(self.value_changed)
         self.condition_edits.append(self.condition_edit5)
 
         self.layout.addWidget(self.description_label)
@@ -98,9 +107,9 @@ class MyDockWidget(QtWidgets.QDockWidget):
             data["Conditions"] = []
         conditions = data["Conditions"]
         for c in self.condition_edits:
-            c.setText("")
+            c.setCurrentIndex(0)
         for i, c in enumerate(conditions):
-            self.condition_edits[i].setText(c)
+            self.condition_edits[i].setCurrentIndex(ALL_CONDITIONS.index(c))
         self.data = data
         self.info_node = node
         self.property_changed.connect(self.info_node.refresh_show)
@@ -111,8 +120,8 @@ class MyDockWidget(QtWidgets.QDockWidget):
             self.data["Description"] = self.description_edit.toPlainText()
             c_list = []
             for c in self.condition_edits:
-                t = c.text()
-                if t:
+                t = c.currentText()
+                if t != "无":
                     c_list.append(t)
             self.data["Conditions"] = c_list
             self.property_changed.emit()

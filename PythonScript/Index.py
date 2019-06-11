@@ -81,7 +81,6 @@ tree1 = Tree(strs)
 BT.tick_all()
 BT.tick_all()
 BT.tick_all()
-BT.tick_all()
 BT.destory_bt()
 
 

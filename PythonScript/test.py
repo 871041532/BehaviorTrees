@@ -2,7 +2,10 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from BT import BT
 
+ALL_CONDITIONS = list(BT.conditions.keys())
+ALL_CONDITIONS.insert(0, "")
 class ComboxDemo(QWidget):
     def __init__(self,parent=None):
         super(ComboxDemo, self).__init__(parent)
